@@ -72,7 +72,7 @@ export default function StoryFeed({
       await addDoc(collection(db, 'stories'), {
         ...newStory,
         createdAt: serverTimestamp(),
-        isApproved: true,
+        isApproved: false,
       });
       setNewStory({ content: '', alias: '', category: 'Experience' });
       setShowForm(false);

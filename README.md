@@ -1,4 +1,4 @@
-# The Pasing Wind
+# The Passing Wind
 
 A decentralized, anonymous storytelling platform designed for survivors, witnesses, and allies. Users can release their "truths to the wind" anonymously, and others can witness or respond to these stories.
 

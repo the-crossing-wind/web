@@ -54,7 +54,7 @@ NEXT_PUBLIC_ADMIN_EMAIL="your-admin-email@gmail.com"
 
    ```javascript
    function isAdmin() {
-     return isEmailVerified() && request.auth.token.email == 'YOUR_ADMIN_EMAIL_HERE';
+     return isEmailVerified() && request.auth.token.email == "YOUR_ADMIN_EMAIL_HERE";
    }
    ```
 
@@ -68,7 +68,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the result.
 
 ## Deployment
 
-This project is ready to be deployed on **Vercel**, **Cloud Run**, or any other Node.js hosting platform. 
+This project is ready to be deployed on **Vercel**, **Cloud Run**, or any other Node.js hosting platform.
 
 When deploying, make sure to add all the environment variables listed in `.env.example` to your deployment's configuration panel.
 

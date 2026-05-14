@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
-import { 
-  collection, 
-  addDoc, 
-  query, 
-  orderBy, 
-  onSnapshot, 
+import { useState, useEffect } from "react";
+import { db, handleFirestoreError, OperationType } from "@/lib/firebase";
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
   serverTimestamp,
-  Timestamp 
-} from 'firebase/firestore';
-import { formatDistanceToNow } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
-import { useLanguage } from '@/lib/i18n';
-import { MessageSquare, Send, User } from 'lucide-react';
+  Timestamp,
+} from "firebase/firestore";
+import { formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import { useLanguage } from "@/lib/i18n";
+import { MessageSquare, Send, User } from "lucide-react";
 
 interface Comment {
   id: string;
@@ -30,8 +30,8 @@ interface CommentSectionProps {
 export default function CommentSection({ storyId }: CommentSectionProps) {
   const { t, language } = useLanguage();
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [alias, setAlias] = useState('');
+  const [newComment, setNewComment] = useState("");
+  const [alias, setAlias] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -39,20 +39,21 @@ export default function CommentSection({ storyId }: CommentSectionProps) {
     if (!storyId) return;
 
     const path = `stories/${storyId}/comments`;
-    const q = query(
-      collection(db, path),
-      orderBy('createdAt', 'desc')
-    );
+    const q = query(collection(db, path), orderBy("createdAt", "desc"));
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Comment[];
-      setComments(docs);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.GET, path);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Comment[];
+        setComments(docs);
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, path);
+      },
+    );
 
     return () => unsubscribe();
   }, [storyId]);
@@ -69,8 +70,8 @@ export default function CommentSection({ storyId }: CommentSectionProps) {
         alias: alias.trim() || null,
         createdAt: serverTimestamp(),
       });
-      setNewComment('');
-      setAlias('');
+      setNewComment("");
+      setAlias("");
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, path);
     } finally {
@@ -80,19 +81,21 @@ export default function CommentSection({ storyId }: CommentSectionProps) {
 
   return (
     <div className="mt-6">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 text-xs font-bold text-text-dim hover:text-brand transition-colors"
       >
         <MessageSquare className="w-4 h-4" />
-        <span>{comments.length} {t.stories.comments.title}</span>
+        <span>
+          {comments.length} {t.stories.comments.title}
+        </span>
       </button>
 
       {isOpen && (
         <div className="mt-4 space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex gap-2">
-              <input 
+              <input
                 type="text"
                 placeholder={t.stories.alias}
                 value={alias}
@@ -102,7 +105,7 @@ export default function CommentSection({ storyId }: CommentSectionProps) {
               />
             </div>
             <div className="flex gap-2">
-              <textarea 
+              <textarea
                 placeholder={t.stories.comments.placeholder}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
@@ -110,7 +113,7 @@ export default function CommentSection({ storyId }: CommentSectionProps) {
                 className="flex-1 px-4 py-2 bg-bg-surface border border-border-main rounded-xl text-sm outline-none focus:border-brand transition-colors resize-none h-20"
                 maxLength={1000}
               />
-              <button 
+              <button
                 type="submit"
                 disabled={submitting || !newComment.trim()}
                 className="self-end p-3 bg-brand text-white rounded-xl hover:opacity-90 disabled:opacity-50 transition-all"
@@ -132,7 +135,12 @@ export default function CommentSection({ storyId }: CommentSectionProps) {
                       {comment.alias || t.stories.comments.anonymous}
                     </span>
                     <span className="text-[9px] font-mono text-text-dim uppercase">
-                      {comment.createdAt?.toDate ? formatDistanceToNow(comment.createdAt.toDate(), { addSuffix: true, locale: language === 'zh' ? zhCN : undefined }) : '...'}
+                      {comment.createdAt?.toDate
+                        ? formatDistanceToNow(comment.createdAt.toDate(), {
+                            addSuffix: true,
+                            locale: language === "zh" ? zhCN : undefined,
+                          })
+                        : "..."}
                     </span>
                   </div>
                   <p className="text-xs text-text-main opacity-80 leading-relaxed bg-bg-surface p-3 rounded-2xl rounded-tl-none">

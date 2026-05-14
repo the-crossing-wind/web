@@ -7,9 +7,20 @@
       "properties": {
         "content": { "type": "string", "description": "The full text of the story." },
         "alias": { "type": "string", "description": "An optional anonymous alias for the author." },
-        "category": { "type": "string", "enum": ["Experience", "Encouragement", "Observation"], "description": "The nature of the post." },
-        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of submission." },
-        "isApproved": { "type": "boolean", "description": "Whether the story has been reviewed for safety (defaults to true for this demo)." }
+        "category": {
+          "type": "string",
+          "enum": ["Experience", "Encouragement", "Observation"],
+          "description": "The nature of the post."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of submission."
+        },
+        "isApproved": {
+          "type": "boolean",
+          "description": "Whether the story has been reviewed for safety (defaults to true for this demo)."
+        }
       },
       "required": ["content", "category", "createdAt"]
     },
@@ -31,7 +42,10 @@
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "content": { "type": "string", "description": "Markdown content explaining the guideline." },
+        "content": {
+          "type": "string",
+          "description": "Markdown content explaining the guideline."
+        },
         "order": { "type": "number", "description": "Display order." }
       },
       "required": ["title", "content", "order"]

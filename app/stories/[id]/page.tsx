@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
-import Navbar from '@/components/Navbar';
-import CommentSection from '@/components/CommentSection';
-import { useLanguage } from '@/lib/i18n';
-import { Heart, ArrowLeft, User as UserIcon, Quote, Sparkles } from 'lucide-react';
-import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
-import { motion } from 'motion/react';
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db, handleFirestoreError, OperationType } from "@/lib/firebase";
+import Navbar from "@/components/Navbar";
+import CommentSection from "@/components/CommentSection";
+import { useLanguage } from "@/lib/i18n";
+import { Heart, ArrowLeft, User as UserIcon, Quote, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
+import { motion } from "motion/react";
 
 interface Story {
   id: string;
   content: string;
   alias?: string;
-  category: 'Experience' | 'Encouragement' | 'Observation';
+  category: "Experience" | "Encouragement" | "Observation";
   createdAt: any;
 }
 
@@ -30,15 +30,19 @@ export default function StoryDetail() {
     if (!id) return;
 
     const path = `stories/${id as string}`;
-    const unsubscribe = onSnapshot(doc(db, path), (docSnap) => {
-      if (docSnap.exists()) {
-        setStory({ id: docSnap.id, ...docSnap.data() } as Story);
-      }
-      setLoading(false);
-    }, (err) => {
-      handleFirestoreError(err, OperationType.GET, path);
-      setLoading(false);
-    });
+    const unsubscribe = onSnapshot(
+      doc(db, path),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setStory({ id: docSnap.id, ...docSnap.data() } as Story);
+        }
+        setLoading(false);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.GET, path);
+        setLoading(false);
+      },
+    );
 
     return () => unsubscribe();
   }, [id]);
@@ -68,14 +72,17 @@ export default function StoryDetail() {
   return (
     <main className="min-h-screen pb-20">
       <Navbar />
-      
+
       <div className="pt-32 pb-12 bg-bg-surface">
         <div className="max-w-3xl mx-auto px-6">
-          <Link href="/stories" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-text-dim hover:text-brand transition-colors mb-8">
+          <Link
+            href="/stories"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-text-dim hover:text-brand transition-colors mb-8"
+          >
             <ArrowLeft className="w-4 h-4" />
             {t.stories.backToArchive}
           </Link>
-          
+
           <article className="bg-bg-base border border-border-main rounded-3xl p-8 sm:p-12 shadow-2xl">
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-4">
@@ -83,9 +90,13 @@ export default function StoryDetail() {
                   <UserIcon className="w-8 h-8 text-text-dim opacity-50" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-xl text-text-main">{story.alias || "Anonymous Agent"}</h2>
+                  <h2 className="font-bold text-xl text-text-main">
+                    {story.alias || "Anonymous Agent"}
+                  </h2>
                   <p className="text-xs font-mono text-text-dim uppercase tracking-widest">
-                    {story.createdAt?.toDate ? formatDistanceToNow(story.createdAt.toDate(), { addSuffix: true }) : 'just now'}
+                    {story.createdAt?.toDate
+                      ? formatDistanceToNow(story.createdAt.toDate(), { addSuffix: true })
+                      : "just now"}
                   </p>
                 </div>
               </div>
@@ -95,7 +106,7 @@ export default function StoryDetail() {
             </div>
 
             <div className="font-serif text-2xl sm:text-3xl leading-relaxed text-text-main opacity-90 whitespace-pre-wrap italic mb-12">
-              "{story.content}"
+              &quot;{story.content}&quot;
             </div>
 
             <div className="pt-8 border-t border-border-main">
@@ -120,12 +131,12 @@ export default function StoryDetail() {
       </div>
 
       <div className="mt-20 flex flex-col items-center text-center px-6">
-          <div className="w-12 h-12 bg-brand rounded-full flex items-center justify-center mb-8 shadow-xl">
-            <Heart className="text-white w-6 h-6 fill-current" />
-          </div>
-          <p className="text-text-dim max-w-md mb-8 leading-relaxed italic text-lg opacity-60">
-            {t.footer.quote}
-          </p>
+        <div className="w-12 h-12 bg-brand rounded-full flex items-center justify-center mb-8 shadow-xl">
+          <Heart className="text-white w-6 h-6 fill-current" />
+        </div>
+        <p className="text-text-dim max-w-md mb-8 leading-relaxed italic text-lg opacity-60">
+          {t.footer.quote}
+        </p>
       </div>
     </main>
   );

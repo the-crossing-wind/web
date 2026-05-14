@@ -1,30 +1,50 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot, limit, serverTimestamp, addDoc, doc, getDocFromServer, where } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '@/lib/firebase';
-import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, Quote, User as UserIcon, Send, Sparkles, AlertCircle, Heart, ArrowLeft } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
-import { useLanguage } from '@/lib/i18n';
-import CommentSection from './CommentSection';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  limit,
+  serverTimestamp,
+  addDoc,
+  doc,
+  getDocFromServer,
+  where,
+} from "firebase/firestore";
+import { db, handleFirestoreError, OperationType } from "@/lib/firebase";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  MessageSquare,
+  Quote,
+  User as UserIcon,
+  Send,
+  Sparkles,
+  AlertCircle,
+  Heart,
+  ArrowLeft,
+} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import { useLanguage } from "@/lib/i18n";
+import CommentSection from "./CommentSection";
+import Link from "next/link";
 
 interface Story {
   id: string;
   content: string;
   alias?: string;
-  category: 'Experience' | 'Encouragement' | 'Observation';
+  category: "Experience" | "Encouragement" | "Observation";
   createdAt: any;
 }
 
-export default function StoryFeed({ 
-  maxStories, 
-  showComments = true, 
+export default function StoryFeed({
+  maxStories,
+  showComments = true,
   truncate = false,
-  interactive = false
-}: { 
+  interactive = false,
+}: {
   maxStories?: number;
   showComments?: boolean;
   truncate?: boolean;
@@ -37,29 +57,33 @@ export default function StoryFeed({
   const [newStory, setNewStory] = useState<{
     content: string;
     alias: string;
-    category: 'Experience' | 'Encouragement' | 'Observation';
-  }>({ content: '', alias: '', category: 'Experience' });
+    category: "Experience" | "Encouragement" | "Observation";
+  }>({ content: "", alias: "", category: "Experience" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(
-      collection(db, 'stories'),
-      where('isApproved', '==', true),
-      orderBy('createdAt', 'desc'),
-      limit(maxStories || 50)
+      collection(db, "stories"),
+      where("isApproved", "==", true),
+      orderBy("createdAt", "desc"),
+      limit(maxStories || 50),
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Story[];
-      setStories(docs);
-      setLoading(false);
-    }, (err) => {
-      handleFirestoreError(err, OperationType.LIST, 'stories');
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Story[];
+        setStories(docs);
+        setLoading(false);
+      },
+      (err) => {
+        handleFirestoreError(err, OperationType.LIST, "stories");
+      },
+    );
 
     return () => unsubscribe();
   }, [maxStories]);
@@ -71,12 +95,12 @@ export default function StoryFeed({
     setSubmitting(true);
     setError(null);
     try {
-      await addDoc(collection(db, 'stories'), {
+      await addDoc(collection(db, "stories"), {
         ...newStory,
         createdAt: serverTimestamp(),
         isApproved: false,
       });
-      setNewStory({ content: '', alias: '', category: 'Experience' });
+      setNewStory({ content: "", alias: "", category: "Experience" });
       setShowForm(false);
     } catch (err) {
       setError(t.common.submitError);
@@ -91,9 +115,9 @@ export default function StoryFeed({
     if (truncate && isLong) {
       return (
         <>
-          "{content.substring(0, 300)}..."
-          <Link 
-            href={`/stories/${id}`} 
+          &quot;{content.substring(0, 300)}...&quot;
+          <Link
+            href={`/stories/${id}`}
             className="block mt-4 text-sm font-bold text-brand hover:underline"
           >
             {t.stories.readFull} →
@@ -108,7 +132,10 @@ export default function StoryFeed({
     <section id="stories" className="py-24 max-w-5xl mx-auto px-6">
       {!maxStories && (
         <div className="mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-text-dim hover:text-brand transition-colors mb-8">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-text-dim hover:text-brand transition-colors mb-8"
+          >
             <ArrowLeft className="w-4 h-4" />
             {t.stories.backToHome}
           </Link>
@@ -120,13 +147,15 @@ export default function StoryFeed({
             <Quote className="w-4 h-4 fill-current" />
             <span>{t.stories.badge}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-text-main">{t.stories.title} <span className="italic text-text-dim">{t.stories.titleAccent}</span></h2>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-text-main">
+            {t.stories.title} <span className="italic text-text-dim">{t.stories.titleAccent}</span>
+          </h2>
           <p className="mt-4 text-text-dim max-w-xl text-base sm:text-lg">
             {t.stories.description}
           </p>
         </div>
-        
-        <button 
+
+        <button
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-3 px-8 py-4 bg-brand text-bg-base rounded-2xl font-bold shadow-xl hover:opacity-90 hover:-translate-y-1 transition-all active:translate-y-0"
         >
@@ -137,26 +166,31 @@ export default function StoryFeed({
 
       <AnimatePresence>
         {showForm && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="mb-16 overflow-hidden"
           >
-            <form onSubmit={handleSubmit} className="bg-bg-base border-2 border-text-main rounded-3xl p-8 shadow-[12px_12px_0px_0px_rgba(26,26,26,0.05)]">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-bg-base border-2 border-text-main rounded-3xl p-8 shadow-[12px_12px_0px_0px_rgba(26,26,26,0.05)]"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-widest text-text-dim mb-2">{t.stories.category}</label>
+                  <label className="block text-xs font-mono uppercase tracking-widest text-text-dim mb-2">
+                    {t.stories.category}
+                  </label>
                   <div className="flex flex-wrap gap-2">
-                    {(['Experience', 'Encouragement', 'Observation'] as const).map((cat) => (
+                    {(["Experience", "Encouragement", "Observation"] as const).map((cat) => (
                       <button
                         key={cat}
                         type="button"
                         onClick={() => setNewStory({ ...newStory, category: cat })}
                         className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${
-                          newStory.category === cat 
-                          ? 'bg-text-main text-bg-base border-text-main' 
-                          : 'bg-bg-base text-text-dim border-border-main hover:border-text-main'
+                          newStory.category === cat
+                            ? "bg-text-main text-bg-base border-text-main"
+                            : "bg-bg-base text-text-dim border-border-main hover:border-text-main"
                         }`}
                       >
                         {t.stories.categories[cat]}
@@ -165,8 +199,10 @@ export default function StoryFeed({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-widest text-text-dim mb-2">{t.stories.alias}</label>
-                  <input 
+                  <label className="block text-xs font-mono uppercase tracking-widest text-text-dim mb-2">
+                    {t.stories.alias}
+                  </label>
+                  <input
                     type="text"
                     value={newStory.alias}
                     onChange={(e) => setNewStory({ ...newStory, alias: e.target.value })}
@@ -176,10 +212,12 @@ export default function StoryFeed({
                   />
                 </div>
               </div>
-              
+
               <div className="mb-6">
-                <label className="block text-xs font-mono uppercase tracking-widest text-text-dim mb-2">{t.stories.formLabelContent}</label>
-                <textarea 
+                <label className="block text-xs font-mono uppercase tracking-widest text-text-dim mb-2">
+                  {t.stories.formLabelContent}
+                </label>
+                <textarea
                   required
                   value={newStory.content}
                   onChange={(e) => setNewStory({ ...newStory, content: e.target.value })}
@@ -201,12 +239,18 @@ export default function StoryFeed({
                   <Sparkles className="w-4 h-4" />
                   <span>{t.stories.anonymousNote}</span>
                 </div>
-                <button 
+                <button
                   disabled={submitting}
                   type="submit"
                   className={`flex items-center gap-2 px-8 py-3 bg-text-main text-bg-base rounded-xl font-bold shadow-md hover:opacity-90 transition-all disabled:opacity-50`}
                 >
-                  {submitting ? t.stories.submittingBtn : <><Send className="w-4 h-4" /> {t.stories.submitBtn}</>}
+                  {submitting ? (
+                    t.stories.submittingBtn
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" /> {t.stories.submitBtn}
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -217,18 +261,18 @@ export default function StoryFeed({
       <div className="grid grid-cols-1 gap-8">
         {loading ? (
           <div className="flex flex-col gap-8">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-64 bg-bg-surface rounded-3xl animate-pulse" />
             ))}
           </div>
         ) : stories.length > 0 ? (
           stories.map((story) => (
-            <motion.article 
+            <motion.article
               key={story.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className={`bg-bg-base border border-border-main rounded-3xl p-8 transition-all group ${
-                interactive ? 'hover:border-brand/30 hover:shadow-xl cursor-default' : ''
+                interactive ? "hover:border-brand/30 hover:shadow-xl cursor-default" : ""
               }`}
             >
               <div className="flex items-center justify-between mb-6">
@@ -237,9 +281,16 @@ export default function StoryFeed({
                     <UserIcon className="w-5 h-5 text-text-dim opacity-50" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-text-main">{story.alias || t.common.anonymousAgent}</h3>
+                    <h3 className="font-bold text-sm text-text-main">
+                      {story.alias || t.common.anonymousAgent}
+                    </h3>
                     <p className="text-[10px] font-mono text-text-dim uppercase tracking-tighter">
-                      {story.createdAt?.toDate ? formatDistanceToNow(story.createdAt.toDate(), { addSuffix: true, locale: language === 'zh' ? zhCN : undefined }) : t.common.justNow}
+                      {story.createdAt?.toDate
+                        ? formatDistanceToNow(story.createdAt.toDate(), {
+                            addSuffix: true,
+                            locale: language === "zh" ? zhCN : undefined,
+                          })
+                        : t.common.justNow}
                     </p>
                   </div>
                 </div>
@@ -247,7 +298,7 @@ export default function StoryFeed({
                   {t.stories.categories[story.category]}
                 </span>
               </div>
-              
+
               <div className="font-serif text-xl leading-relaxed text-text-main opacity-80 whitespace-pre-wrap italic">
                 {renderStoryContent(story.content, story.id)}
               </div>
@@ -255,22 +306,24 @@ export default function StoryFeed({
               {showComments && <CommentSection storyId={story.id} />}
 
               <div className="mt-8 pt-6 border-t border-border-main flex items-center justify-between">
-                 <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4">
                   <button className="flex items-center gap-2 text-xs font-bold text-text-dim hover:text-brand transition-colors">
                     <Heart className="w-4 h-4" />
                     <span>{t.stories.witnessed}</span>
                   </button>
                   <span className="w-1 h-1 bg-border-main rounded-full"></span>
-                  <p className="text-[10px] font-mono text-text-dim uppercase">{t.stories.securityNote}</p>
-                 </div>
-                 {interactive && (
-                   <Link 
-                     href={`/stories/${story.id}`} 
-                     className="text-xs font-bold text-brand hover:underline"
-                   >
-                     {t.stories.viewDetails} →
-                   </Link>
-                 )}
+                  <p className="text-[10px] font-mono text-text-dim uppercase">
+                    {t.stories.securityNote}
+                  </p>
+                </div>
+                {interactive && (
+                  <Link
+                    href={`/stories/${story.id}`}
+                    className="text-xs font-bold text-brand hover:underline"
+                  >
+                    {t.stories.viewDetails} →
+                  </Link>
+                )}
               </div>
             </motion.article>
           ))
@@ -282,7 +335,7 @@ export default function StoryFeed({
 
         {maxStories && stories.length >= maxStories && (
           <div className="mt-16 text-center">
-            <Link 
+            <Link
               href="/stories"
               className="inline-flex items-center gap-2 px-8 py-3 border-2 border-text-main text-text-main rounded-xl font-bold hover:bg-text-main hover:text-bg-base transition-all"
             >

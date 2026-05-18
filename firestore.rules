@@ -16,8 +16,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      // REPLACE_WITH_YOUR_ADMIN_EMAIL: The email address that should have admin privileges
-      return isEmailVerified() && request.auth.token.email == 'idadwind@gmail.com';
+      return isEmailVerified() && request.auth.token.email in ['example@example.com'];
     }
 
     function isValidId(id) {
@@ -92,6 +91,11 @@ service cloud.firestore {
     match /ally_guidelines/{guidelineId} {
       allow read: if true;
       allow write: if isAdmin() && isValidGuideline(incoming());
+    }
+
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
     }
   }
 }

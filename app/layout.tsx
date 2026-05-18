@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/i18n";
 import { ThemeProvider } from "@/lib/ThemeContext";
+import { AuthProvider } from "@/lib/AuthContext";
 import SmoothScroll from "@/components/SmoothScroll";
 import BackToTop from "@/components/BackToTop";
 
@@ -28,10 +29,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased" suppressHydrationWarning>
         <ThemeProvider>
           <LanguageProvider>
-            <SmoothScroll>
-              {children}
-              <BackToTop />
-            </SmoothScroll>
+            <AuthProvider>
+              <SmoothScroll>
+                {children}
+                <BackToTop />
+              </SmoothScroll>
+            </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

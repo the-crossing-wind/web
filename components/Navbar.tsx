@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { auth, googleProvider } from "@/lib/firebase";
-import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
+import { signInWithPopup, signOut } from "firebase/auth";
+import { useAuth } from "@/lib/AuthContext";
 import { Heart, LogIn, LogOut, Globe, Moon, Sun, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/i18n";
 import { useTheme } from "@/lib/ThemeContext";
 
 export default function Navbar() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, isAdmin } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, language, setLanguage, availableLanguages } = useLanguage();
   const { theme, toggleTheme } = useTheme();
@@ -20,16 +21,10 @@ export default function Navbar() {
     setLanguage(availableLanguages[nextIndex].code);
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
-    return () => unsubscribe();
-  }, []);
-
   const handleLogin = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error: any) {
-      // Gracefully handle case where user closes the popup
       if (
         error.code === "auth/popup-closed-by-user" ||
         error.code === "auth/cancelled-popup-request"
@@ -57,25 +52,13 @@ export default function Navbar() {
           </div>
         </Link>
         <div className="hidden lg:flex items-center gap-8 text-sm font-medium uppercase tracking-widest text-text-main">
-          <Link
-            href="#stories"
-            onClick={() => setIsMenuOpen(false)}
-            className="hover:text-brand transition-colors"
-          >
+          <Link href="#stories" onClick={() => setIsMenuOpen(false)} className="hover:text-brand transition-colors">
             {t.nav.stories}
           </Link>
-          <Link
-            href="#resources"
-            onClick={() => setIsMenuOpen(false)}
-            className="hover:text-brand transition-colors"
-          >
+          <Link href="#resources" onClick={() => setIsMenuOpen(false)} className="hover:text-brand transition-colors">
             {t.nav.resources}
           </Link>
-          <Link
-            href="#allies"
-            onClick={() => setIsMenuOpen(false)}
-            className="hover:text-brand transition-colors"
-          >
+          <Link href="#allies" onClick={() => setIsMenuOpen(false)} className="hover:text-brand transition-colors">
             {t.nav.allies}
           </Link>
         </div>
@@ -100,9 +83,7 @@ export default function Navbar() {
           {user ? (
             <div className="hidden sm:flex items-center gap-3 sm:gap-4">
               <span className="text-xs font-mono text-text-dim hidden xl:block">
-                {user.email === "idadwind@gmail.com"
-                  ? "ADMIN"
-                  : user.email?.split("@")[0].toUpperCase()}
+                {isAdmin ? "ADMIN" : user.email?.split("@")[0].toUpperCase()}
               </span>
               <button
                 onClick={handleLogout}
@@ -135,36 +116,21 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="lg:hidden absolute top-16 sm:top-20 left-0 w-full bg-bg-base border-b border-border-main p-6 space-y-6 shadow-xl animate-in slide-in-from-top duration-300">
           <div className="flex flex-col gap-4 text-sm font-bold uppercase tracking-widest text-text-main">
-            <Link
-              href="#stories"
-              onClick={() => setIsMenuOpen(false)}
-              className="hover:text-brand transition-colors flex items-center justify-between"
-            >
+            <Link href="#stories" onClick={() => setIsMenuOpen(false)} className="hover:text-brand transition-colors flex items-center justify-between">
               {t.nav.stories}
               <Heart className="w-4 h-4 text-brand" />
             </Link>
-            <Link
-              href="#resources"
-              onClick={() => setIsMenuOpen(false)}
-              className="hover:text-brand transition-colors"
-            >
+            <Link href="#resources" onClick={() => setIsMenuOpen(false)} className="hover:text-brand transition-colors">
               {t.nav.resources}
             </Link>
-            <Link
-              href="#allies"
-              onClick={() => setIsMenuOpen(false)}
-              className="hover:text-brand transition-colors"
-            >
+            <Link href="#allies" onClick={() => setIsMenuOpen(false)} className="hover:text-brand transition-colors">
               {t.nav.allies}
             </Link>
           </div>
           <div className="pt-6 border-t border-border-main flex flex-col gap-4">
             {user ? (
               <button
-                onClick={() => {
-                  handleLogout();
-                  setIsMenuOpen(false);
-                }}
+                onClick={() => { handleLogout(); setIsMenuOpen(false); }}
                 className="flex items-center justify-center gap-2 w-full py-4 border border-border-main rounded-full text-sm font-bold text-text-main hover:bg-bg-surface transition-all"
               >
                 <LogOut className="w-5 h-5" />
@@ -172,10 +138,7 @@ export default function Navbar() {
               </button>
             ) : (
               <button
-                onClick={() => {
-                  handleLogin();
-                  setIsMenuOpen(false);
-                }}
+                onClick={() => { handleLogin(); setIsMenuOpen(false); }}
                 className="flex items-center justify-center gap-2 w-full py-4 bg-text-main text-bg-base rounded-full text-sm font-bold shadow-lg"
               >
                 <LogIn className="w-5 h-5" />
@@ -184,10 +147,7 @@ export default function Navbar() {
             )}
 
             <button
-              onClick={() => {
-                toggleLanguage();
-                setIsMenuOpen(false);
-              }}
+              onClick={() => { toggleLanguage(); setIsMenuOpen(false); }}
               className="flex items-center justify-center gap-2 w-full py-4 border border-border-main rounded-full text-xs font-black uppercase tracking-widest text-text-main"
             >
               <Globe className="w-4 h-4" />

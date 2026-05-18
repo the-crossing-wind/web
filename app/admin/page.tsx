@@ -10,13 +10,10 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { db, auth } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
+import { useAuth } from "@/lib/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 import Navbar from "@/components/Navbar";
-import { useRouter } from "next/navigation";
-
-const ADMIN_EMAIL = "idadwind@gmail.com";
 
 interface Story {
   id: string;
@@ -28,28 +25,22 @@ interface Story {
 }
 
 export default function AdminPage() {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const { user, isAdmin, isLoading } = useAuth();
   const [stories, setStories] = useState<Story[]>([]);
   const [tab, setTab] = useState<"pending" | "approved">("pending");
-  const router = useRouter();
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (u) => setUser(u));
-  }, []);
-
-  useEffect(() => {
-    if (user === undefined) return;
-    if (!user || user.email !== ADMIN_EMAIL) return;
+    if (!user || !isAdmin) return;
 
     const q = query(collection(db, "stories"), orderBy("createdAt", "desc"));
     return onSnapshot(q, (snap) => {
       setStories(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Story));
     });
-  }, [user]);
+  }, [user, isAdmin]);
 
-  if (user === undefined) return null;
+  if (isLoading) return null;
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (!user || !isAdmin) {
     return (
       <main className="min-h-screen">
         <Navbar />
@@ -96,10 +87,7 @@ export default function AdminPage() {
             </div>
           ) : (
             displayed.map((story) => (
-              <article
-                key={story.id}
-                className="bg-bg-base border border-border-main rounded-3xl p-8"
-              >
+              <article key={story.id} className="bg-bg-base border border-border-main rounded-3xl p-8">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="font-bold text-sm text-text-main">{story.alias || "Anonymous"}</p>

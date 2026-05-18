@@ -54,7 +54,7 @@ NEXT_PUBLIC_ADMIN_EMAIL="your-admin-email@gmail.com"
 
    ```javascript
    function isAdmin() {
-     return isEmailVerified() && request.auth.token.email == "YOUR_ADMIN_EMAIL_HERE";
+     return isEmailVerified() && request.auth.token.email in ["admin1@example.com", "admin2@example.com"];
    }
    ```
 
